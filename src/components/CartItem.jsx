@@ -1,44 +1,49 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { useSelector, useDispatch } from "react-redux";
+import { removeItem, updateQuantity } from "../redux/CartSlice";
 
-const initialState = {
-  items: []
-};
+function CartItem() {
+  const cartItems = useSelector(state => state.cart.items);
+  const dispatch = useDispatch();
 
-const cartSlice = createSlice({
-  name: "cart",
-  initialState,
-  reducers: {
+  const total = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
-    addItem: (state, action) => {
-      const item = action.payload;
-      const existing = state.items.find(i => i.id === item.id);
+  return (
+    <div>
+      <h2>Shopping Cart</h2>
 
-      if (existing) {
-        existing.quantity++;
-      } else {
-        state.items.push({ ...item, quantity: 1 });
-      }
-    },
+      {cartItems.length === 0 ? (
+        <p>No items in cart</p>
+      ) : (
+        cartItems.map(item => (
+          <div key={item.id}>
+            <h3>{item.name}</h3>
+            <p>${item.price} x {item.quantity}</p>
+            <p>Total: ${item.price * item.quantity}</p>
 
-    removeItem: (state, action) => {
-      state.items = state.items.filter(i => i.id !== action.payload);
-    },
+            <button onClick={() => dispatch(updateQuantity({ id: item.id, amount: 1 }))}>
+              +
+            </button>
 
-    updateQuantity: (state, action) => {
-      const { id, amount } = action.payload;
-      const item = state.items.find(i => i.id === id);
+            <button onClick={() => dispatch(updateQuantity({ id: item.id, amount: -1 }))}>
+              -
+            </button>
 
-      if (item) {
-        item.quantity += amount;
+            <button onClick={() => dispatch(removeItem(item.id))}>
+              Remove
+            </button>
+          </div>
+        ))
+      )}
 
-        if (item.quantity <= 0) {
-          state.items = state.items.filter(i => i.id !== id);
-        }
-      }
-    }
+      <h3>Total Cart Value: ${total}</h3>
 
-  }
-});
+      <button>Continue Shopping</button>
+      <button>Checkout</button>
+    </div>
+  );
+}
 
-export const { addItem, removeItem, updateQuantity } = cartSlice.actions;
-export default cartSlice.reducer;
+export default CartItem;
