@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { removeItem, updateQuantity } from "../redux/CartSlice";
 
-function CartItem() {
+function CartItem({ goToProducts }) {
   const cartItems = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
 
@@ -40,8 +40,13 @@ function CartItem() {
 
       <h3>Total Cart Value: ${total}</h3>
 
-      <button>Continue Shopping</button>
-      <button>Checkout</button>
+      <button onClick={goToProducts}>
+        Continue Shopping
+      </button>
+
+      <button onClick={() => alert("Checkout coming soon!")}>
+        Checkout
+      </button>
     </div>
   );
 }
